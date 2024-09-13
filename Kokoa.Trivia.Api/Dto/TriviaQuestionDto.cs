@@ -8,7 +8,7 @@ public class TriviaQuestionDto
     public int Id { get; set; }
 
     [JsonPropertyName("title")]
-    public string Title { get; set; }
+    public required string Title { get; set; }
 
     [JsonPropertyName("correct_option")]
     public TriviaOptionDto CorrectOption { get; set; } = null!;

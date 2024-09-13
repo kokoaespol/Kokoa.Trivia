@@ -8,5 +8,5 @@ public class TriviaOptionDto
     public int Id { get; set; }
 
     [JsonPropertyName("content")]
-    public string Content { get; set; }
+    public required string Content { get; set; }
 }
