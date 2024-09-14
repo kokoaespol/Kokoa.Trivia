@@ -13,5 +13,6 @@ public class TriviaQuestion
     [Column("Title")]
     public string Title { get; set; } = null!;
 
+    public TriviaAnswer TriviaAnswer { get; set; } = null!;
     public ICollection<TriviaOption> TriviaOptions { get; set; } = new List<TriviaOption>();
 }
