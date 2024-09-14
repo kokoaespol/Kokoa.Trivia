@@ -1,4 +1,5 @@
-﻿using ErrorOr;
+﻿using EntityFramework.Exceptions.Common;
+using ErrorOr;
 using Kokoa.Trivia.Api.Database;
 using Kokoa.Trivia.Api.Models;
 using MediatR;
@@ -23,6 +24,12 @@ public class CreateTriviaQuestionCommand(string title, List<string> options, int
             await using var trx = await db.Database.BeginTransactionAsync(cancellationToken);
             try
             {
+                if (command.Title.Length == 0)
+                    return Error.Validation(description: "The question title must not be empty");
+
+                if (command.Options.Any(x => x.Length == 0))
+                    return Error.Validation(description: "The question options must not be empty");
+
                 if (command.Options.Count <= 0)
                     return Error.Validation(description: "Question must have at least one option");
 
@@ -44,9 +51,14 @@ public class CreateTriviaQuestionCommand(string title, List<string> options, int
                 await db.TriviaOptions.AddRangeAsync(options, cancellationToken);
                 await db.SaveChangesAsync(cancellationToken);
 
-                var correctOption = db.TriviaOptions.FirstAsync(
+                var correctOption = await db.TriviaOptions.FirstAsync(
                     x => x.Content == correctOptionText,
                     cancellationToken);
+
+                logger.LogInformation(
+                    "Creating trivia question: {QuestionId} {CorrectOptionId}",
+                    questionResult.Entity.Id,
+                    correctOption.Id);
 
                 var answer = new TriviaAnswer
                 {
@@ -59,6 +71,11 @@ public class CreateTriviaQuestionCommand(string title, List<string> options, int
                 await trx.CommitAsync(cancellationToken);
 
                 return questionResult.Entity;
+            }
+            catch (UniqueConstraintException)
+            {
+                await trx.RollbackAsync(cancellationToken);
+                return Error.Validation(description: "A question with that title already exists");
             }
             catch (Exception ex)
             {

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Kokoa.Trivia.Api.Models;
 
@@ -8,7 +9,8 @@ public class TriviaOption
     [Column("TRIVIA_OPTION_ID")]
     public int Id { get; set; }
 
-    [Column("content")]
+    [MaxLength(255)]
+    [Column("Content")]
     public string Content { get; set; } = null!;
 
     [Column("TRIVIA_QUESTION_ID")]
