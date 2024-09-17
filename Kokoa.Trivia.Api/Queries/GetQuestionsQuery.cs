@@ -5,8 +5,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Kokoa.Trivia.Api.Queries;
 
-public class GetQuestionsQuery : IRequest<IEnumerable<TriviaQuestionAnswer>>
+public class GetQuestionsQuery(int topicId) : IRequest<IEnumerable<TriviaQuestionAnswer>>
 {
+    public int TopicId { get; set; } = topicId;
+
     public class Handler(TriviaDbContext db) : IRequestHandler<GetQuestionsQuery, IEnumerable<TriviaQuestionAnswer>>
     {
         private readonly TriviaDbContext _db = db;
@@ -19,6 +21,7 @@ public class GetQuestionsQuery : IRequest<IEnumerable<TriviaQuestionAnswer>>
                 .Include(x => x.TriviaOptions)
                 .Include(x => x.TriviaAnswer)
                 .ThenInclude(x => x.TriviaOption)
+                .Where(x => x.TriviaTopicId == query.TopicId)
                 .Select(x => new TriviaQuestionAnswer
                 {
                     Id = x.Id,
