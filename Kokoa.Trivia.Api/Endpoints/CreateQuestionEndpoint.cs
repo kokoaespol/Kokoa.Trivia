@@ -12,7 +12,7 @@ namespace Kokoa.Trivia.Api.Endpoints;
 
 [AllowAnonymous]
 [HttpPost("/api/questions")]
-public class CreateQuestionEndpoint: Endpoint<NewTriviaQuestionDto, Results<Created, BadRequest<string>>>
+public class CreateQuestionEndpoint : Endpoint<NewTriviaQuestionDto, Results<Created<TriviaQuestionDto>, BadRequest<string>>>
 {
     private readonly IMediator _mediator;
     private readonly TriviaQuestionMapper _mapper;
@@ -23,7 +23,7 @@ public class CreateQuestionEndpoint: Endpoint<NewTriviaQuestionDto, Results<Crea
         _mapper = mapper;
     }
 
-    public override async Task<Results<Created, BadRequest<string>>> ExecuteAsync(
+    public override async Task<Results<Created<TriviaQuestionDto>, BadRequest<string>>> ExecuteAsync(
         NewTriviaQuestionDto req,
         CancellationToken ct)
     {
@@ -35,6 +35,14 @@ public class CreateQuestionEndpoint: Endpoint<NewTriviaQuestionDto, Results<Crea
 
         result.IsError.Throw().IfTrue();
 
-        return TypedResults.Created("/api/v1/questions/" + result.Value.Id);
+        var response = new TriviaQuestionDto
+        {
+            Id = result.Value.Id,
+            Title = result.Value.Title,
+            Options = result.Value.TriviaOptions.Select(x => _mapper.TriviaOptionToTriviaOptionDto(x)),
+            CorrectOption = _mapper.TriviaOptionToTriviaOptionDto(result.Value.TriviaAnswer.TriviaOption)
+        };
+
+        return TypedResults.Created("/api/v1/questions/" + result.Value.Id, response);
     }
 }

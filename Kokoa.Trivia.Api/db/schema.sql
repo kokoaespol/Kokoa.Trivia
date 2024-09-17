@@ -1,24 +1,24 @@
-create table "T_TRIVIA_QUESTION"
+create table "TriviaQuestions"
 (
-    "TRIVIA_QUESTION_ID" serial primary key,
+    "Id" integer generated always as identity primary key,
     "Title"              varchar(255) not null unique
 );
 
-create table "T_TRIVIA_OPTION"
+create table "TriviaOptions"
 (
-    "TRIVIA_OPTION_ID"   serial primary key,
-    "TRIVIA_QUESTION_ID" integer      not null
-        references "T_TRIVIA_QUESTION" ("TRIVIA_QUESTION_ID")
+    "Id"   integer generated always as identity primary key,
+    "TriviaQuestionId" integer      not null
+        references "TriviaQuestions" ("Id")
             on delete cascade,
     "Content"            varchar(255) not null
 );
 
-create table "T_TRIVIA_ANSWER"
+create table "TriviaAnswers"
 (
-    "TRIVIA_QUESTION_ID" integer not null
-        references "T_TRIVIA_QUESTION" ("TRIVIA_QUESTION_ID")
+    "TriviaQuestionId" integer not null
+        references "TriviaQuestions" ("Id")
             on delete cascade,
-    "TRIVIA_OPTION_ID"   integer not null
-        references "T_TRIVIA_OPTION" ("TRIVIA_OPTION_ID")
+    "TriviaOptionId"   integer not null
+        references "TriviaOptions" ("Id")
             on delete cascade
 );

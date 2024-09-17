@@ -37,33 +37,24 @@ public class CreateTriviaQuestionCommand(string title, List<string> options, int
                 if (correctOptionIndex < 0 || correctOptionIndex >= command.Options.Count)
                     return Error.Validation(description: "Correct option index is not valid");
 
-                var correctOptionText = command.Options[correctOptionIndex];
-
                 var question = new TriviaQuestion { Title = command.Title };
-                var questionResult = await db.TriviaQuestions.AddAsync(question, cancellationToken);
+                var questionResult = db.TriviaQuestions.Add(question);
                 await db.SaveChangesAsync(cancellationToken);
 
                 var options = command.Options.Select(x => new TriviaOption
                 {
                     TriviaQuestionId = questionResult.Entity.Id,
                     Content = x
-                });
-                await db.TriviaOptions.AddRangeAsync(options, cancellationToken);
+                })
+                .ToList();
+
+                db.TriviaOptions.AddRange(options);
                 await db.SaveChangesAsync(cancellationToken);
-
-                var correctOption = await db.TriviaOptions.FirstAsync(
-                    x => x.Content == correctOptionText,
-                    cancellationToken);
-
-                logger.LogInformation(
-                    "Creating trivia question: {QuestionId} {CorrectOptionId}",
-                    questionResult.Entity.Id,
-                    correctOption.Id);
 
                 var answer = new TriviaAnswer
                 {
                     TriviaQuestionId = questionResult.Entity.Id,
-                    TriviaOptionId = correctOption.Id
+                    TriviaOptionId = options[command.CorrectOption].Id
                 };
                 await db.TriviaAnswers.AddAsync(answer, cancellationToken);
                 await db.SaveChangesAsync(cancellationToken);
@@ -72,8 +63,9 @@ public class CreateTriviaQuestionCommand(string title, List<string> options, int
 
                 return questionResult.Entity;
             }
-            catch (UniqueConstraintException)
+            catch (UniqueConstraintException ex)
             {
+                logger.LogError("Unique constraint violation: {Exception}", ex);
                 await trx.RollbackAsync(cancellationToken);
                 return Error.Validation(description: "A question with that title already exists");
             }
