@@ -4,6 +4,8 @@ namespace Kokoa.Trivia.Api.Dto;
 
 public class NewTriviaQuestionDto
 {
+    public int TopicId { get; set; } 
+    
     [JsonPropertyName("title")]
     public required string Title { get; set; }
 

@@ -7,9 +7,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Kokoa.Trivia.Api.Commands;
 
-public class CreateTriviaQuestionCommand(string title, List<string> options, int correctOption)
+public class CreateTriviaQuestionCommand(int topicId, string title, List<string> options, int correctOption)
     : IRequest<ErrorOr<TriviaQuestion>>
 {
+    public int TriviaTopicId { get; set; } = topicId;
     public string Title { get; set; } = title;
     public List<string> Options { get; set; } = options;
     public int CorrectOption { get; set; } = correctOption;
@@ -37,13 +38,17 @@ public class CreateTriviaQuestionCommand(string title, List<string> options, int
                 if (correctOptionIndex < 0 || correctOptionIndex >= command.Options.Count)
                     return Error.Validation(description: "Correct option index is not valid");
 
+                var topic = await db.TriviaTopics.FirstOrDefaultAsync(x => x.Id == command.TriviaTopicId, cancellationToken);
+                if (topic is null)
+                    return Error.NotFound(description: "No topic with that ID");
+
                 var question = new TriviaQuestion { Title = command.Title };
-                var questionResult = db.TriviaQuestions.Add(question);
+                topic.TriviaQuestions.Add(question);
                 await db.SaveChangesAsync(cancellationToken);
 
                 var options = command.Options.Select(x => new TriviaOption
                 {
-                    TriviaQuestionId = questionResult.Entity.Id,
+                    TriviaQuestionId = question.Id,
                     Content = x
                 })
                 .ToList();
@@ -53,7 +58,7 @@ public class CreateTriviaQuestionCommand(string title, List<string> options, int
 
                 var answer = new TriviaAnswer
                 {
-                    TriviaQuestionId = questionResult.Entity.Id,
+                    TriviaQuestionId = question.Id,
                     TriviaOptionId = options[command.CorrectOption].Id
                 };
                 await db.TriviaAnswers.AddAsync(answer, cancellationToken);
@@ -61,7 +66,7 @@ public class CreateTriviaQuestionCommand(string title, List<string> options, int
 
                 await trx.CommitAsync(cancellationToken);
 
-                return questionResult.Entity;
+                return question;
             }
             catch (UniqueConstraintException ex)
             {

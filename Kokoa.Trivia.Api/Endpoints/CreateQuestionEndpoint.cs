@@ -5,14 +5,16 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using ErrorOr;
+using Kokoa.Trivia.Api.Commands;
 using Throw;
 using Created = Microsoft.AspNetCore.Http.HttpResults.Created;
 
 namespace Kokoa.Trivia.Api.Endpoints;
 
 [AllowAnonymous]
-[HttpPost("/api/questions")]
-public class CreateQuestionEndpoint : Endpoint<NewTriviaQuestionDto, Results<Created<TriviaQuestionDto>, BadRequest<string>>>
+[HttpPost("/api/topics/{TopicId:int}/questions")]
+public class CreateQuestionEndpoint
+    : Endpoint<NewTriviaQuestionDto, Results<Created<TriviaQuestionDto>, BadRequest<string>>>
 {
     private readonly IMediator _mediator;
     private readonly TriviaQuestionMapper _mapper;
@@ -27,7 +29,12 @@ public class CreateQuestionEndpoint : Endpoint<NewTriviaQuestionDto, Results<Cre
         NewTriviaQuestionDto req,
         CancellationToken ct)
     {
-        var command = _mapper.NewTriviaQuestionDtoToCreateTriviaQuestionCommand(req);
+        var command = new CreateTriviaQuestionCommand(
+            req.TopicId,
+            req.Title,
+            req.Options.ToList(),
+            req.CorrectOption);
+
         var result = await _mediator.Send(command, ct);
 
         if (result is { IsError: true, FirstError.Type: ErrorType.Validation })

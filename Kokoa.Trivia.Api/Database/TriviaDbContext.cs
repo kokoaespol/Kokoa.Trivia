@@ -54,7 +54,7 @@ public class TriviaDbContext : DbContext
 
         modelBuilder.Entity<TriviaQuestion>()
             .HasOne(x => x.TriviaTopic)
-            .WithMany()
+            .WithMany(x => x.TriviaQuestions)
             .HasForeignKey(x => x.TriviaTopicId)
             .HasPrincipalKey(x => x.Id);
     }
