@@ -12,4 +12,6 @@ public partial class TriviaQuestionMapper
         NewTriviaQuestionDto dto);
 
     public partial TriviaOptionDto TriviaOptionToTriviaOptionDto(TriviaOption option);
+
+    public partial TriviaQuestionDto TriviaQuestionAnswerToTriviaQuestionDto(TriviaQuestionAnswer answer);
 }

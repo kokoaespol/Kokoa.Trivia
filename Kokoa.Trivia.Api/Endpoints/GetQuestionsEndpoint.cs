@@ -16,9 +16,8 @@ public class GetQuestionsEndpoint : EndpointWithoutRequest<IEnumerable<TriviaQue
 
     public override async Task<IEnumerable<TriviaQuestionDto>> ExecuteAsync(CancellationToken ct)
     {
-        // var query = new GetQuestionsQuery();
-        // var questions = await Mediator.Send(query, ct);
-        // return questions.Select(x => Mapper.TriviaQuestionAnswerToTriviaQuestionDto(x));
-        return [];
+        var query = new GetQuestionsQuery();
+        var questions = await Mediator.Send(query, ct);
+        return questions.Select(x => Mapper.TriviaQuestionAnswerToTriviaQuestionDto(x));
     }
 }

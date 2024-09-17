@@ -18,9 +18,13 @@ public class GetQuestionsQuery : IRequest<IEnumerable<TriviaQuestionAnswer>>
             return await _db.TriviaQuestions
                 .Include(x => x.TriviaOptions)
                 .Include(x => x.TriviaAnswer)
+                .ThenInclude(x => x.TriviaOption)
                 .Select(x => new TriviaQuestionAnswer
                 {
-
+                    Id = x.Id,
+                    Title = x.Title,
+                    Options = x.TriviaOptions,
+                    CorrectOption = x.TriviaAnswer.TriviaOption
                 })
                 .ToListAsync(cancellationToken);
         }
