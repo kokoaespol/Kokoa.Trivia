@@ -1,6 +1,15 @@
+create table "TriviaTopics"
+(
+    "Id" integer generated always as identity primary key,
+    "Name" varchar(255) not null
+);
+
 create table "TriviaQuestions"
 (
     "Id" integer generated always as identity primary key,
+    "TriviaTopicId" integer not null
+        references "TriviaTopics" ("Id")
+            on delete cascade,
     "Title"              varchar(255) not null unique
 );
 

@@ -8,6 +8,10 @@ public class TriviaQuestion
     public int Id { get; set; }
     [MaxLength(255)]
     public string Title { get; set; } = null!;
+
+    public int TriviaTopicId { get; set; }
+    public TriviaTopic TriviaTopic { get; set; } = null!;
+
     public TriviaAnswer TriviaAnswer { get; set; } = null!;
     public ICollection<TriviaOption> TriviaOptions { get; set; } = new List<TriviaOption>();
 }

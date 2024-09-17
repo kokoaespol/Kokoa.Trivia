@@ -16,6 +16,8 @@ public class TriviaDbContext : DbContext
     public DbSet<TriviaQuestion> TriviaQuestions { get; set; } = null!;
     public DbSet<TriviaOption> TriviaOptions { get; set; } = null!;
     public DbSet<TriviaAnswer> TriviaAnswers { get; set; } = null!;
+    
+    public DbSet<TriviaTopic> TriviaTopics { get; set; } = null!;
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -39,16 +41,21 @@ public class TriviaDbContext : DbContext
             .UseIdentityAlwaysColumn()
             .ValueGeneratedOnAdd();
 
+        modelBuilder.Entity<TriviaTopic>()
+            .Property(x => x.Id)
+            .UseIdentityAlwaysColumn()
+            .ValueGeneratedOnAdd();
+
         modelBuilder.Entity<TriviaQuestion>()
             .HasOne(x => x.TriviaAnswer)
             .WithOne(x => x.TriviaQuestion)
             .HasForeignKey<TriviaQuestion>(x => x.Id)
             .HasPrincipalKey<TriviaAnswer>(x => x.TriviaQuestionId);
 
-        // modelBuilder.Entity<TriviaQuestion>()
-        //     .HasMany(x => x.TriviaOptions)
-        //     .WithOne()
-        //     .HasForeignKey(x => x.TriviaQuestionId)
-        //     .HasPrincipalKey(x => x.Id);
+        modelBuilder.Entity<TriviaQuestion>()
+            .HasOne(x => x.TriviaTopic)
+            .WithMany()
+            .HasForeignKey(x => x.TriviaTopicId)
+            .HasPrincipalKey(x => x.Id);
     }
 }
