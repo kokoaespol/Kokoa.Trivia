@@ -12,7 +12,7 @@ namespace Kokoa.Trivia.Api.Endpoints;
 [HttpPost("/api/topics")]
 public class CreateTriviaTopicEndpoint : Endpoint<NewTriviaTopicDto, Results<Created<TriviaTopicDto>, BadRequest>>
 {
-    public IMediator Mediator { get; set; }
+    public IMediator Mediator { get; set; } = null!;
 
     public override async Task<Results<Created<TriviaTopicDto>, BadRequest>> ExecuteAsync(
         NewTriviaTopicDto req,

@@ -14,4 +14,6 @@ public partial class TriviaQuestionMapper
     public partial TriviaOptionDto TriviaOptionToTriviaOptionDto(TriviaOption option);
 
     public partial TriviaQuestionDto TriviaQuestionAnswerToTriviaQuestionDto(TriviaQuestionAnswer answer);
+    
+    public partial TriviaTopicDto TriviaTopicToTriviaTopicDto(TriviaTopic topic);
 }
