@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { base } from '$app/paths';
 	import * as Accordion from '$lib/components/ui/accordion';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Dialog from '$lib/components/ui/dialog';
@@ -34,7 +35,7 @@
 
 		loading = true;
 
-		const response = await fetch(`/api/topics/${topic.id}/questions`);
+		const response = await fetch(`${base}/api/topics/${topic.id}/questions`);
 		if (!response.ok) {
 			const err = await response.text();
 			return toast.error(err);

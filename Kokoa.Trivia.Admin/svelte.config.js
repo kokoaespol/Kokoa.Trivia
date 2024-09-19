@@ -12,7 +12,8 @@ const config = {
 		// See https://kit.svelte.dev/docs/adapters for more information about adapters.
 		adapter: adapter(),
 		paths: {
-			assets: process.env.NODE_ENV === "production" ? 'https://kokoa.espol.edu.ec/trivia-admin' : ''
+			assets: process.env.NODE_ENV === "production" ? 'https://kokoa.espol.edu.ec/trivia-admin' : '',
+			// base: process.env.NODE_ENV === 'production' ? '/trivia-admin' : '',
 		}
 	}
 };
