@@ -1,13 +1,16 @@
 import { API_BASE_URL } from '$env/static/private';
-import type { RequestHandler } from '@sveltejs/kit';
+import { error, json, type RequestHandler } from '@sveltejs/kit';
 
 export const GET: RequestHandler = async ({ fetch, params }) => {
-	const res = await fetch(`${API_BASE_URL}/api/topics/${params.id}/questions`);
-	if (!res.ok) {
-		const text = await res.text();
-		console.error(res.status + ':' + text);
+	const topicId = params.id;
+	const response = await fetch(`${API_BASE_URL}/api/topics/${topicId}/questions`);
+
+	if (!response.ok) {
+		const err = await response.text();
+		throw error(response.status, err);
 	}
-	const questions = await res.json();
-	const response = JSON.stringify(questions);
-	return new Response(response, { status: 200 });
+
+	const questions = await response.json();
+
+	return json(questions);
 };

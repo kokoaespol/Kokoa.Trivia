@@ -1,20 +1,12 @@
 import { API_BASE_URL } from '$env/static/private';
 import type { Topic } from '$lib/types/topic';
-import { error } from '@sveltejs/kit';
-import type { PageServerLoad, Actions } from './$types';
-import type { Question } from '$lib/types/question';
+import { fail } from '@sveltejs/kit';
+import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ fetch }) => {
 	const topics: Topic[] = await fetch(`${API_BASE_URL}/api/topics`).then((res) => res.json());
-	let questions: Question[] = [];
-
-	if (topics.length > 0) {
-		questions = await fetch(`/api/topics/${topics[0].id}/questions`).then((res) => res.json());
-	}
-
 	return {
-		topics,
-		questions
+		topics
 	};
 };
 
@@ -24,7 +16,7 @@ export const actions: Actions = {
 		const data = { name: formData.get('name') as string };
 
 		if (data.name?.length === 0) {
-			throw error(400, 'Invalid topic name');
+			return fail(400, { error: true, message: 'Invalid topic name' });
 		}
 
 		const response = await fetch(`${API_BASE_URL}/api/topics`, {
@@ -35,10 +27,11 @@ export const actions: Actions = {
 
 		if (!response.ok) {
 			const err = await response.text();
-			throw error(response.status, err);
+			return fail(response.status, { error: true, message: err });
 		}
 
 		return {
+			success: true,
 			message: 'Topic created successfully'
 		};
 	},
@@ -48,8 +41,46 @@ export const actions: Actions = {
 		const data = {
 			title: formData.get('title'),
 			options: (formData.get('options') as string)?.split(','),
-			correct_option: formData.get('correct_option')
+			correct_option: parseInt(formData.get('correct_option') as string)
 		};
-		console.log(data);
+
+		if (!data.title) {
+			return fail(400, {
+				error: true,
+				message: 'The title is mandatory'
+			});
+		}
+
+		if (data.options.length < 1 || data.options.every((o) => o.length === 0)) {
+			return fail(400, {
+				error: true,
+				message: 'The question must have at least one option'
+			});
+		}
+
+		if (data.correct_option >= data.options.length || data.correct_option < 0) {
+			return fail(400, {
+				error: true,
+				message: 'The selected option is not valid'
+			});
+		}
+
+		const response = await fetch(`${API_BASE_URL}/api/topics/${topicId}/questions`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(data)
+		});
+
+		if (!response.ok) {
+			return fail(response.status, {
+				error: true,
+				message: 'There was an error creating the question'
+			});
+		}
+
+		return {
+			success: true,
+			message: 'Question created successfully'
+		};
 	}
 };
