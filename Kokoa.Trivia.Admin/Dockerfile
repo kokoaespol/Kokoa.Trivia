@@ -18,5 +18,6 @@ COPY package.json ./
 COPY package-lock.json ./
 
 RUN npm ci --omit dev
+RUN echo ${API_BASE_URL}
 
 CMD ["node", "build"]
