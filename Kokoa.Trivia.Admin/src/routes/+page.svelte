@@ -9,6 +9,7 @@
 	import type { ActionData, PageData } from './$types';
 	import QuestionsPane from './questions-pane.svelte';
 	import TopicCard from './topic-card.svelte';
+	import mascota from '$lib/assets/MASCOTA.png';
 
 	export let form: ActionData;
 	export let data: PageData;
@@ -22,39 +23,47 @@
 	$: form?.success && toast.success(form.message);
 </script>
 
-<h1 class="p-4 text-center text-2xl">Kokoa Trivia Admin</h1>
+<svelte:head>
+	<title>Admin | KOKOA Trivia</title>
+</svelte:head>
 
-<Resizable.PaneGroup direction="horizontal">
-	<Resizable.Pane>
-		<div class="flex flex-col gap-2 p-4">
-			<div
-				id="toolbar"
-				class="mb-2 flex items-center justify-between gap-2 rounded-sm border p-2 shadow-md"
-			>
-				<h2 class="mb-2">Topics</h2>
-				<form class="flex w-full items-center" action="?/createTopic" method="POST" use:enhance>
-					<Input class="w-full" type="text" name="name" placeholder="New topic" />
-					<Button variant="ghost" class="text-green-400" type="submit">
-						<Plus />
-					</Button>
-				</form>
-			</div>
-			{#each data.topics as topic, ix}
-				<TopicCard
-					class={data.topics[ix].id === activeTopic.id ? 'border-primary' : ''}
-					on:click={() => onClickTopic(ix)}
+<div class="flex flex-col items-center">
+	<header class="flex w-full flex-col items-center rounded-sm bg-accent/60 shadow-md">
+		<img src={mascota} alt="kokoa" width="100" />
+		<h1 class="p-4 text-center text-2xl">Kokoa Trivia Admin</h1>
+	</header>
+	<Resizable.PaneGroup direction="horizontal">
+		<Resizable.Pane>
+			<div class="flex flex-col gap-2 p-4">
+				<div
+					id="toolbar"
+					class="mb-2 flex items-center justify-between gap-2 rounded-sm border p-2 shadow-md"
 				>
-					{topic.name}
-				</TopicCard>
-			{/each}
-		</div>
-	</Resizable.Pane>
-	<Resizable.Handle />
-	<Resizable.Pane>
-		<div class="p-4">
-			{#key activeTopic}
-				<QuestionsPane topic={activeTopic} />
-			{/key}
-		</div>
-	</Resizable.Pane>
-</Resizable.PaneGroup>
+					<h2 class="mb-2">Topics</h2>
+					<form class="flex w-full items-center" action="?/createTopic" method="POST" use:enhance>
+						<Input class="w-full" type="text" name="name" placeholder="New topic" />
+						<Button variant="ghost" class="text-accent" type="submit">
+							<Plus />
+						</Button>
+					</form>
+				</div>
+				{#each data.topics as topic, ix}
+					<TopicCard
+						class={data.topics[ix].id === activeTopic.id ? 'border-primary' : ''}
+						on:click={() => onClickTopic(ix)}
+					>
+						{topic.name}
+					</TopicCard>
+				{/each}
+			</div>
+		</Resizable.Pane>
+		<Resizable.Handle />
+		<Resizable.Pane>
+			<div class="p-4">
+				{#key activeTopic}
+					<QuestionsPane topic={activeTopic} />
+				{/key}
+			</div>
+		</Resizable.Pane>
+	</Resizable.PaneGroup>
+</div>

@@ -54,7 +54,7 @@
 	<h2>Questions</h2>
 	<Dialog.Root>
 		<Dialog.Trigger>
-			<Button variant="ghost" class="text-green-400" type="submit">
+			<Button variant="ghost" class="text-accent" type="submit">
 				<Plus />
 			</Button>
 		</Dialog.Trigger>
@@ -96,7 +96,7 @@
 							role="row"
 							tabindex="-1"
 							class="rounded-sm border p-1 {correctOption == ix
-								? 'border-green-400'
+								? 'border-accent'
 								: ''} transition-all"
 						>
 							{option}
@@ -117,9 +117,9 @@
 					<Accordion.Trigger>{question.title}</Accordion.Trigger>
 					<Accordion.Content>
 						<div class="flex flex-col gap-1">
-							{#each question.options as option, ix}
+							{#each question.options.toReversed() as option, ix}
 								{#if question.correct_option.id == option.id}
-									<span class="text-green-500">{ix + 1}. {option.content}</span>
+									<span class="text-accent">{ix + 1}. {option.content}</span>
 								{:else}
 									<span>{ix + 1}. {option.content}</span>
 								{/if}
