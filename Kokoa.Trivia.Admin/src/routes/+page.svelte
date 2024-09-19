@@ -28,7 +28,7 @@
 </svelte:head>
 
 <div class="flex flex-col items-center">
-	<header class="flex w-full flex-col items-center rounded-sm bg-accent/60 shadow-md">
+	<header class="flex w-full flex-col items-center">
 		<img src={mascota} alt="kokoa" width="100" />
 		<h1 class="p-4 text-center text-2xl">Kokoa Trivia Admin</h1>
 	</header>
