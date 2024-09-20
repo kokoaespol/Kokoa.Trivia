@@ -8,7 +8,6 @@ using Throw;
 
 namespace Kokoa.Trivia.Api.Endpoints;
 
-[AllowAnonymous]
 [HttpPost("/api/topics")]
 public class CreateTriviaTopicEndpoint : Endpoint<NewTriviaTopicDto, Results<Created<TriviaTopicDto>, BadRequest>>
 {

@@ -11,7 +11,6 @@ using Created = Microsoft.AspNetCore.Http.HttpResults.Created;
 
 namespace Kokoa.Trivia.Api.Endpoints;
 
-[AllowAnonymous]
 [HttpPost("/api/topics/{TopicId:int}/questions")]
 public class CreateQuestionEndpoint
     : Endpoint<NewTriviaQuestionDto, Results<Created<TriviaQuestionDto>, BadRequest<string>>>
