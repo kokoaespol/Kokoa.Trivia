@@ -1,7 +1,12 @@
-import { AUTH_CLIENT_ID, AUTH_CLIENT_SECRET, AUTH_TOKEN_URL } from '$env/static/private';
+import {
+	AUTH_CLIENT_ID,
+	AUTH_CLIENT_SECRET,
+	AUTH_REDIRECT_URI,
+	AUTH_TOKEN_URL
+} from '$env/static/private';
 import { redirect, type RequestHandler } from '@sveltejs/kit';
 
-export const GET: RequestHandler = async ({ url, fetch }) => {
+export const GET: RequestHandler = async ({ url, fetch, cookies }) => {
 	const code = url.searchParams.get('code');
 	if (!code) {
 		throw redirect(302, '/unauthorized');
@@ -13,7 +18,7 @@ export const GET: RequestHandler = async ({ url, fetch }) => {
 		grant_type: 'authorization_code',
 		client_id: AUTH_CLIENT_ID,
 		client_secret: AUTH_CLIENT_SECRET,
-		redirect_uri: url.origin,
+		redirect_uri: AUTH_REDIRECT_URI,
 		code
 	});
 
@@ -29,8 +34,10 @@ export const GET: RequestHandler = async ({ url, fetch }) => {
 		throw redirect(302, '/unauthorized');
 	}
 
-	const data = await response.json();
-	console.log(data);
+	const { access_token, refresh_token } = await response.json();
 
-	return new Response('Deez nuts');
+	cookies.set('session_token', access_token, { path: '/' });
+	cookies.set('refresh_token', refresh_token, { path: '/' });
+
+	throw redirect(302, '/');
 };
