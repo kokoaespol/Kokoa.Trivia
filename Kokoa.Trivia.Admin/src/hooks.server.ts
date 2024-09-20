@@ -40,7 +40,7 @@ export const handleFetch: HandleFetch = async ({ request, fetch, event }) => {
 		request.headers.append('Authorization', 'Bearer ' + accessToken);
 	}
 
-	const body = await request.clone().arrayBuffer();
+	const body = await request.clone().text();
 	const response = await fetch(request);
 
 	if (response.status !== 401) {
@@ -80,10 +80,11 @@ export const handleFetch: HandleFetch = async ({ request, fetch, event }) => {
 
 	return await fetch(request.url, {
 		method: request.method,
-		headers: {
-			...request.headers,
-			Authorization: `Bearer: ${accessToken}`
-		},
+		credentials: 'include',
+		headers: (() => {
+			request.headers.set('Authorization', 'Bearer ' + access_token);
+			return request.headers;
+		})(),
 		body
 	});
 };
