@@ -8,6 +8,11 @@ import {
 import { redirect, type Handle, type HandleFetch } from '@sveltejs/kit';
 
 export const handle: Handle = async ({ event, resolve }) => {
+	if (event.isSubRequest) {
+		// See: https://github.com/sveltejs/kit/issues/12692
+		return event.fetch(event.request);
+	}
+
 	const token = event.cookies.get('session_token');
 
 	if (
@@ -35,7 +40,9 @@ export const handleFetch: HandleFetch = async ({ request, fetch, event }) => {
 		request.headers.append('Authorization', 'Bearer ' + accessToken);
 	}
 
+	const body = await request.clone().arrayBuffer();
 	const response = await fetch(request);
+
 	if (response.status !== 401) {
 		return response;
 	}
@@ -71,8 +78,12 @@ export const handleFetch: HandleFetch = async ({ request, fetch, event }) => {
 	event.cookies.set('session_token', access_token, { path: '/' });
 	event.cookies.set('refresh_token', refresh_token, { path: '/' });
 
-	request = new Request(request.url, request);
-	request.headers.append('Authorization', 'Bearer ' + accessToken);
-
-	return await fetch(request);
+	return await fetch(request.url, {
+		method: request.method,
+		headers: {
+			...request.headers,
+			Authorization: `Bearer: ${accessToken}`
+		},
+		body
+	});
 };
