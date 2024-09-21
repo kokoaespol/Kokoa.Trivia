@@ -1,15 +1,17 @@
 import {
+	APP_BASE_PATH,
 	AUTH_CLIENT_ID,
 	AUTH_CLIENT_SECRET,
 	AUTH_REDIRECT_URI,
 	AUTH_TOKEN_URL
 } from '$env/static/private';
+import { setCookie } from '$lib/utils';
 import { redirect, type RequestHandler } from '@sveltejs/kit';
 
 export const GET: RequestHandler = async ({ url, fetch, cookies }) => {
 	const code = url.searchParams.get('code');
 	if (!code) {
-		throw redirect(302, '/unauthorized');
+		throw redirect(302, `${APP_BASE_PATH}/unauthorized`);
 	}
 
 	console.debug(`Got code: ${code}`);
@@ -31,13 +33,13 @@ export const GET: RequestHandler = async ({ url, fetch, cookies }) => {
 	if (!response.ok) {
 		const err = await response.text();
 		console.log(response.status, err);
-		throw redirect(302, '/unauthorized');
+		throw redirect(302, `${APP_BASE_PATH}/unauthorized`);
 	}
 
 	const { access_token, refresh_token } = await response.json();
 
-	cookies.set('session_token', access_token, { path: '/' });
-	cookies.set('refresh_token', refresh_token, { path: '/' });
+	setCookie(cookies, 'session_token', access_token);
+	setCookie(cookies, 'refresh_token', refresh_token);
 
-	throw redirect(302, '/');
+	throw redirect(302, APP_BASE_PATH);
 };

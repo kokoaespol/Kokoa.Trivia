@@ -1,25 +1,34 @@
 import {
+	APP_BASE_PATH,
 	AUTH_CLIENT_ID,
 	AUTH_CLIENT_SECRET,
 	AUTH_CODE_URL,
 	AUTH_REDIRECT_URI,
 	AUTH_TOKEN_URL
 } from '$env/static/private';
+import { setCookie } from '$lib/utils';
 import { redirect, type Handle, type HandleFetch } from '@sveltejs/kit';
 
 export const handle: Handle = async ({ event, resolve }) => {
 	if (event.isSubRequest) {
-		// See: https://github.com/sveltejs/kit/issues/12692
-		return event.fetch(event.request);
+		// See: https://github.comevent.request/sveltejs/kit/issues/12692
+		console.log('subRequest detected, making manual call');
+		return await fetch(event.request.url, {
+			method: event.request.method,
+			headers: event.request.headers,
+			credentials: 'include',
+			body: await event.request.text()
+		});
 	}
 
 	const token = event.cookies.get('session_token');
 
 	if (
 		!token &&
-		!event.url.pathname.startsWith('/api/login/callback') &&
-		!event.url.pathname.startsWith('/unauthorized')
+		!event.url.pathname.startsWith(`${APP_BASE_PATH}/api/login/callback`) &&
+		!event.url.pathname.startsWith(`${APP_BASE_PATH}/unauthorized`)
 	) {
+		console.log(`Access token is not set in session cookie: ${token}`);
 		const url = new URL(AUTH_CODE_URL);
 		url.searchParams.append('client_id', AUTH_CLIENT_ID);
 		url.searchParams.append('client_secret', AUTH_CLIENT_SECRET);
@@ -48,7 +57,7 @@ export const handleFetch: HandleFetch = async ({ request, fetch, event }) => {
 	}
 
 	if (!refreshToken) {
-		return redirect(302, '/');
+		return redirect(302, APP_BASE_PATH);
 	}
 
 	console.debug('Access token has expired, refetching tokens with refresh token');
@@ -71,12 +80,12 @@ export const handleFetch: HandleFetch = async ({ request, fetch, event }) => {
 		console.debug('Session has expired, deleting cookies and redirecting to /');
 		event.cookies.delete('session_token', { path: '/' });
 		event.cookies.delete('refresh_token', { path: '/' });
-		return redirect(302, '/');
+		return redirect(302, APP_BASE_PATH);
 	}
 
 	const { access_token, refresh_token } = await refresh_response.json();
-	event.cookies.set('session_token', access_token, { path: '/' });
-	event.cookies.set('refresh_token', refresh_token, { path: '/' });
+	setCookie(event.cookies, 'session_token', access_token);
+	setCookie(event.cookies, 'refresh_token', refresh_token);
 
 	return await fetch(request.url, {
 		method: request.method,
