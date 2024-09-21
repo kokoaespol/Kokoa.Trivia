@@ -7,6 +7,8 @@ export const GET: RequestHandler = async (event) => {
 
 	console.log('Logging out');
 
+	// TODO: Include id_token_hint to avoid confirming logout.
+
 	const url = new URL(AUTH_LOGOUT_URL);
 	url.searchParams.append('post_logout_redirect_uri', AUTH_LOGOUT_REDIRECT_URI);
 	url.searchParams.append('client_id', AUTH_CLIENT_ID);
