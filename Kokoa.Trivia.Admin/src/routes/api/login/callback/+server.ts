@@ -41,5 +41,6 @@ export const GET: RequestHandler = async ({ url, fetch, cookies }) => {
 	setCookie(cookies, 'session_token', access_token);
 	setCookie(cookies, 'refresh_token', refresh_token);
 
+	console.log(`Login successful, redirecting to: ${APP_BASE_PATH}`);
 	throw redirect(302, APP_BASE_PATH);
 };

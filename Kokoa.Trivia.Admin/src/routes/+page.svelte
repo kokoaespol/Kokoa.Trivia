@@ -9,7 +9,6 @@
 	import type { ActionData, PageData } from './$types';
 	import QuestionsPane from './questions-pane.svelte';
 	import TopicCard from './topic-card.svelte';
-	import mascota from '$lib/assets/MASCOTA.png';
 
 	export let form: ActionData;
 	export let data: PageData;
@@ -27,11 +26,7 @@
 	<title>Admin | KOKOA Trivia</title>
 </svelte:head>
 
-<div class="flex flex-col items-center">
-	<header class="flex w-full flex-col items-center">
-		<img src={mascota} alt="kokoa" width="100" />
-		<h1 class="p-4 text-center text-2xl">Kokoa Trivia Admin</h1>
-	</header>
+<div class="flex flex-col items-center py-8">
 	<Resizable.PaneGroup direction="horizontal">
 		<Resizable.Pane>
 			<div class="flex flex-col gap-2 p-4">

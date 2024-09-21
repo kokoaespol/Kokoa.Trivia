@@ -26,8 +26,10 @@ export const handle: Handle = async ({ event, resolve }) => {
 	if (
 		!token &&
 		!event.url.pathname.startsWith(`/api/login/callback`) &&
-		!event.url.pathname.startsWith(`/unauthorized`)
+		!event.url.pathname.startsWith(`/unauthorized`) &&
+		!event.url.pathname.startsWith(`/api/logout`)
 	) {
+		console.log(`token=(${token}); event.url=(${event.url})`);
 		const url = new URL(AUTH_CODE_URL);
 		url.searchParams.append('client_id', AUTH_CLIENT_ID);
 		url.searchParams.append('client_secret', AUTH_CLIENT_SECRET);
@@ -93,6 +95,6 @@ export const handleFetch: HandleFetch = async ({ request, fetch, event }) => {
 			request.headers.set('Authorization', 'Bearer ' + access_token);
 			return request.headers;
 		})(),
-		body
+		body: ['GET', 'HEAD'].includes(request.method) ? null : body
 	});
 };
