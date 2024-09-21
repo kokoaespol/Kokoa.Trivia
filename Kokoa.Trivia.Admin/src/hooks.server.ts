@@ -25,10 +25,9 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 	if (
 		!token &&
-		!event.url.pathname.startsWith(`${APP_BASE_PATH}/api/login/callback`) &&
-		!event.url.pathname.startsWith(`${APP_BASE_PATH}/unauthorized`)
+		!event.url.pathname.startsWith(`/api/login/callback`) &&
+		!event.url.pathname.startsWith(`/unauthorized`)
 	) {
-		console.log(`Access token is not set in session cookie: ${token}`);
 		const url = new URL(AUTH_CODE_URL);
 		url.searchParams.append('client_id', AUTH_CLIENT_ID);
 		url.searchParams.append('client_secret', AUTH_CLIENT_SECRET);
