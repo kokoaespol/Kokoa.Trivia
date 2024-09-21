@@ -17,7 +17,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 			method: event.request.method,
 			headers: event.request.headers,
 			credentials: 'include',
-			body: await event.request.text()
+			body: ['GET', 'HEAD'].includes(event.request.method) ? null : await event.request.text()
 		});
 	}
 
