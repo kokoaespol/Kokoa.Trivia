@@ -6,7 +6,7 @@
 	import type { LayoutData } from './$types';
 	import { LogOut } from 'lucide-svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
-	import { APP_BASE_PATH } from '$env/static/private';
+	import { PUBLIC_APP_BASE_PATH } from '$env/static/public';
 
 	export let data: LayoutData;
 </script>
@@ -25,7 +25,10 @@
 	</div>
 	<div class="flex items-center">
 		<span>Welcome back, {data.name}</span>
-		<Button variant="ghost" on:click={() => window.location.replace(`${APP_BASE_PATH}/api/logout`)}>
+		<Button
+			variant="ghost"
+			on:click={() => window.location.replace(`${PUBLIC_APP_BASE_PATH}/api/logout`)}
+		>
 			<LogOut />
 		</Button>
 	</div>
